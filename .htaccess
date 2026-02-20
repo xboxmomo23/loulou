@@ -1,0 +1,48 @@
+# ─── Loulouchana — .htaccess ───────────────────────────────────
+# Sécurité de base pour hébergement IONOS
+
+# Encodage UTF-8 par défaut
+AddDefaultCharset UTF-8
+
+# ── Bloquer l'accès direct aux dossiers sensibles ──────────────
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Bloquer accès direct au dossier vendor/
+    RewriteRule ^vendor/ - [F,L]
+
+    # Bloquer accès direct à composer.json / composer.lock
+    RewriteRule ^composer\.(json|lock)$ - [F,L]
+
+    # Bloquer accès aux fichiers .env si présents
+    RewriteRule ^\.env - [F,L]
+</IfModule>
+
+# ── Sécurité HTTP Headers ──────────────────────────────────────
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ── Désactiver le listing des dossiers ────────────────────────
+Options -Indexes
+
+# ── Gzip compression (performances) ───────────────────────────
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json
+</IfModule>
+
+# ── Cache navigateur (performances) ───────────────────────────
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css             "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType image/jpeg           "access plus 6 months"
+    ExpiresByType image/png            "access plus 6 months"
+    ExpiresByType image/webp           "access plus 6 months"
+</IfModule>
+
+# ── Page d'erreur personnalisée (optionnel) ────────────────────
+# ErrorDocument 404 /index.html
